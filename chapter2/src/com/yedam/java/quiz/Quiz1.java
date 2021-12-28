@@ -15,7 +15,7 @@ public class Quiz1 {
 		
 		System.out.println("a = " + a + " , b = " + b + " , c = " + c);
 		
-		
+		 
 	}
 
 }
