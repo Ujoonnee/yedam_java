@@ -43,7 +43,7 @@ public class ConditionalStatementExample {
 		}
 
 		// Math.random(); 0 이상 1 미만의 랜덤한 값을 제공
-		// (int)(Math.random() * (max)) + min
+		// (int)(Math.random() * (max - min)) + min
 
 		int num = (int) (Math.random() * 6) + 1;
 		System.out.println(num);
