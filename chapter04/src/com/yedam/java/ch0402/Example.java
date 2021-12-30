@@ -13,33 +13,33 @@ public class Example {
 		for (int i = 0; i < 91; i += 10) {
 			System.out.println(i);
 		}
-		
+
 		System.out.println();
-		
+
 		// 예제2 - 0부터 20까지 짝수만 출력
 		System.out.println("예제 2");
 		for (int i = 0; i < 21; i += 2) {
-				System.out.println(i);
+			System.out.println(i);
 		}
 		System.out.println();
-		
+
 		// 예제3 - 숫자를 5번 입력하고, 입력받을 때 마다 더해지는 값을 출력
 		System.out.println("예제 3");
 		System.out.println("숫자 5개를 입력하세요");
 		for (int i = 0, sum = 0; i < 5; i++) {
 			System.out.println("숫자를 입력하세요");
-			sum += sc.nextInt(); 
+			sum += sc.nextInt();
 			System.out.println("출력 : " + sum);
 		}
 		System.out.println();
-		
+
 		// 예제4 - 1부터 사용자가 입력한 숫자까지 합계;
 		System.out.println("예제 4");
 		System.out.println("숫자를 입력하세요");
 		int input = sc.nextInt();
-		int sum = 0; 
-		for(int i = 0; i <= input; i++) {
-			sum +=i; 
+		int sum = 0;
+		for (int i = 0; i <= input; i++) {
+			sum += i;
 		}
 		System.out.println("1부터 " + input + "까지의 합 : " + sum);
 		System.out.println();
@@ -50,7 +50,7 @@ public class Example {
 		// ***
 		// ****
 		// *****
-		
+
 		System.out.println("문제 1");
 		String tree = "";
 		for (int i = 0; i < 5; i++) {
@@ -86,13 +86,13 @@ public class Example {
 		}
 		System.out.println("x : " + x + ", y : " + y);
 		System.out.println();
-		
+
 		// 문제4) do ~ while문과 Math.random()함수를 이용하여 1 ~ 10의 정수 중 7이라는 수가 나올때까지 숫자를 출력하는
 		// 코드를 작성해보세요.
 		System.out.println("문제 4");
 		int result;
 		do {
-			result = (int)(Math.random() * 10) + 1;
+			result = (int) (Math.random() * 10) + 1;
 			System.out.println(result);
 		} while (result != 7);
 		System.out.println();
@@ -102,29 +102,29 @@ public class Example {
 		// 숫자의 합이 5가 아니면 계속 주사위를 던지고, 숫자의 합이 5이면 실행을 멈추는 코드를 작성해보세요.
 		// 또한 주사위를 몇번 던졌는지 횟수를 출력하세요.
 		// 숫자의 합이 5가 되는 조합은 (1,4), (4,1), (2,3),(3,2)
-		
+
 		System.out.println("문제 5");
 		count = 0;
 		while (true) {
 			count++;
 			System.out.print("set" + count + " : ");
-			int dice1 = (int)(Math.random() * 7) + 1;
-			int dice2 = (int)(Math.random() * 7) + 1;
+			int dice1 = (int) (Math.random() * 7) + 1;
+			int dice2 = (int) (Math.random() * 7) + 1;
 			System.out.printf("(%d,%d)\n", dice1, dice2);
 			System.out.println();
-			
+
 			if (dice1 + dice2 == 5) {
 				break;
 			}
 		}
 		System.out.println("count : " + count);
 		System.out.println();
-		
+
 		// 문제7)
 		System.out.println("문제 7");
 		boolean run = true;
 		int balance = 0;
-		
+
 		while (run) {
 			System.out.println("----------------------------------------------");
 			System.out.println("1.예금 | 2.출금 | 3.잔고 | 4.종료");
@@ -141,21 +141,16 @@ public class Example {
 			case 2:
 				System.out.println("출금액> ");
 				int withdraw = sc.nextInt();
-				if(balance - withdraw < 0) {
-					System.out.println("잔액이 부족합니다.");
-					continue;
-				} else {
-					balance -= withdraw;
-					System.out.println("잔고> " + balance);
-					break;
-				}
+				balance -= withdraw;
+				System.out.println("잔고> " + balance);
+				break;
 			case 3:
 				System.out.println("잔고> " + balance);
 				break;
 			case 4:
 				run = false;
 				break;
-			default :
+			default:
 				System.out.println("잘못 입력하셨습니다.");
 				continue;
 			}
