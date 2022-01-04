@@ -33,5 +33,28 @@ public class ReferenceTypeExample2 {
 			}
 		}
 		
+		
+		// for문으로 배열 복사
+		int[] oldIntArray = {1, 2, 3};
+		int[] newIntArray = new int[5];
+		
+		for (int i = 0; i < oldIntArray.length; i++) {
+			newIntArray[i] = oldIntArray[i];
+		} 
+		
+		for (int value : newIntArray) {
+			System.out.println(value);
+		}
+		
+		// System.arraycopy()로 배열 복사
+		String[] oldStrArray = {"java", "array", "copy"};
+		String[] newStrArray = new String[5];
+
+		System.arraycopy(oldStrArray, 0, newStrArray, 0, oldStrArray.length);
+		
+		for (String string : newStrArray) {
+			System.out.println(string);
+		}
+			
 	}
 }
