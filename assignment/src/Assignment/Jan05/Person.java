@@ -1,7 +1,7 @@
 package Assignment.Jan05;
 
 public class Person {
-
+	
 	private String name;
 	private int money;
 	
