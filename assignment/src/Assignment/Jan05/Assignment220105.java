@@ -3,7 +3,7 @@ package Assignment.Jan05;
 public class Assignment220105 {
 	
 	public static void main(String[] args) {
-			
+		
 		System.out.println("======= 문제1번");
 		//문제1) 아침 출근길에 김 씨는 4,000원을 내고 별다방에서 아메리카노를 마셨습니다.
 		//		이 씨는 콩다방에서 4,500원을 내고 라떼를 사 마셨습니다.

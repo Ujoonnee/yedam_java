@@ -1,7 +1,7 @@
 package Assignment.Jan05;
 
 public class CardCompany {
-		
+	
 	private static CardCompany cardCompany = new CardCompany();
 	
 	private CardCompany() {}

@@ -1,7 +1,7 @@
 package Assignment.Jan05;
 
 public class StarCafe {
-		
+	
 	private String name;
 	private int income = 0;
 	private int passengerCount = 0;
