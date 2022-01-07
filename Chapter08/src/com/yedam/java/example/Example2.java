@@ -123,7 +123,7 @@ public class Example2 {
 			  main() 메소드와 실행 결과는 다음과 같다.
 			  - abstract class Converter {
    					abstract protected double convert(double src); // 추상 메소드
-   					abstract protected String getSrcString(); // 추상 메소드
+   					abstract protected String getSrcString(); // 추상 메소드 
    					abstract protected String getDestString(); // 추상 메소드
    					protected double ratio; // 비율
    					public void run() {
