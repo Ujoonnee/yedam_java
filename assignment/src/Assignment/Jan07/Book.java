@@ -3,6 +3,7 @@ package Assignment.Jan07;
 public class Book {
 
 	private static int serialNo = 0;
+	private int bookNo;
 	private String name;
 	private String author;
 	private boolean isOut = false;
@@ -11,6 +12,7 @@ public class Book {
 		this.name = name;
 		this.author = author;
 		serialNo++;
+		bookNo = serialNo;
 	}
 
 	public String getName() {
@@ -27,6 +29,10 @@ public class Book {
 
 	public void setAuthor(String author) {
 		this.author = author;
+	}
+	
+	public int getBookNo() {
+		return bookNo;
 	}
 
 	public boolean isOut() {

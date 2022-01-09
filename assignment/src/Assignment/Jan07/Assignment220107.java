@@ -1,11 +1,13 @@
 package Assignment.Jan07;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Assignment220107 {
 	// 문제) 다음은 도서관리프로그램 중 일부입니다.
 	// 1) 메뉴는 다음과 같이 구성하세요.
-	// 1.책정보 입력 | 2.전체조회 | 3.단건조회 | 4.책 대여 | 5.책 반납 | 6.종료
+	// 1.책정보 입력 \t 2.전체조회 \t 3.단건조회 \t 4.책 대여 \t 5.책 반납 \t 6.종료
 	// 2) 입력되는 책정보는 책이름과 저자명입니다.
 	// 3) 전체 조회 및 단건 조회 시 책번호, 책이름, 저자명, 해당 책의 대여여부(대여중, 대여가능)도 함께 출력되도록 하세요.
 	// 4) 책 대여 시 해당 책의 대여여부를 확인해서
@@ -25,6 +27,9 @@ public class Assignment220107 {
 	public static void main(String[] args) {
 
 		Scanner sc = new Scanner(System.in);
+		List<Book> list = new ArrayList<Book>();
+		
+
 		boolean run = true;
 
 		while (run) {
@@ -36,31 +41,87 @@ public class Assignment220107 {
 
 			switch (menu) {
 			case 1:
-				
+				// book information
+				System.out.println("책 이름>");
+				String name = sc.nextLine();
+				System.out.println("작가 이름>");
+				String author = sc.nextLine();
+				Book book = new Book(name, author);
+
+				list.add(book);
 				break;
 
 			case 2:
-
+				// information all
+				System.out.println();
+				System.out.printf("%-5s \t %-15s \t %-6s \t %-6s\n", "도서 번호", "도서명", "저자", "대여 가능 여부");
+				System.out.println("--------------------------------------------------------------");
+				for (Book books : list) {
+					String rent = (books.isOut()) ? "대여 중" : "대여 가능";
+					System.out.printf("%-5d \t %-15s \t %-6s \t %-6s\n", books.getBookNo(), books.getName(),
+							books.getAuthor(), rent);
+				}
+				System.out.println();
 				break;
 
 			case 3:
-
+				// information selected
+				System.out.println("제목>");
+				String search = sc.nextLine();
+				System.out.println();
+				System.out.printf("%-5s \t %-15s \t %-6s \t %-6s\n", "도서 번호", "도서명", "저자", "대여 가능 여부");
+				System.out.println("--------------------------------------------------------------");
+				for (Book books : list) {
+					if (books.getName().equals(search)) {
+						String rent = (books.isOut()) ? "대여 중" : "대여 가능";
+						System.out.printf("%-5d \t %-15s \t %-6s \t %-6s\n", books.getBookNo(), books.getName(),
+								books.getAuthor(), rent);
+					}
+				}
+				System.out.println();
 				break;
 
 			case 4:
-
+				// book rent
+				System.out.println("대여할 책 제목>");
+				String rental = sc.nextLine();
+				for (Book books : list) {
+					if (books.getName().equals(rental)) {
+						if (books.isOut() == false) {
+							books.setOut(true);
+							System.out.println("대여되었습니다.");
+						} else {
+							System.out.println("대여 중");
+						}
+					}
+				}
+				System.out.println();
 				break;
 
 			case 5:
-
+				// book return
+				System.out.println("반납할 책 제목>");
+				String returnBook = sc.nextLine();
+				for (Book books : list) {
+					if (books.getName().equals(returnBook) && (books.isOut() == true)) {
+						books.setOut(false);
+						System.out.println("반납되었습니다.");
+						break;
+					} else {
+						continue;
+					}
+				}
+				System.out.println();
 				break;
 
 			case 6:
-
+				run = false;
+				System.out.println("프로그램 종료");
 				break;
 
 			}
 
 		}
+		sc.close();
 	}
 }
