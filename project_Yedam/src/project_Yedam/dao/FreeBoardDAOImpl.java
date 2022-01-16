@@ -4,23 +4,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import project_Yedam.VO.FreeBoard;
+import project_Yedam.VO.Article;
 
-public class FreeBoardDAOImpl extends DAO implements ProjectDAO<FreeBoard> {
+public class FreeBoardDAOImpl extends DAO implements ProjectDAO<Article> {
 
-	private static ProjectDAO<FreeBoard> instance = new FreeBoardDAOImpl();
+	private static ProjectDAO<Article> instance = new FreeBoardDAOImpl();
 
 	private FreeBoardDAOImpl() {
 	}
 
-	public static ProjectDAO<FreeBoard> getInstance() {
+	public static ProjectDAO<Article> getInstance() {
 		return instance;
 	}
 
 	// show all FreeBoards
 	@Override
-	public List<FreeBoard> selectAll() {
-		List<FreeBoard> list = new ArrayList<>();
+	public List<Article> selectAll() {
+		List<Article> list = new ArrayList<>();
 		try {
 			connect();
 			String select = "SELECT * FROM freeBoard";
@@ -28,7 +28,7 @@ public class FreeBoardDAOImpl extends DAO implements ProjectDAO<FreeBoard> {
 			rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
-				FreeBoard freeBoard = new FreeBoard();
+				Article freeBoard = new Article();
 				freeBoard.setBoardNum(rs.getInt(1));
 				freeBoard.setPoster(rs.getString(2));
 				freeBoard.setTitle(rs.getString(3));
@@ -51,7 +51,7 @@ public class FreeBoardDAOImpl extends DAO implements ProjectDAO<FreeBoard> {
 
 	// register FreeBoard
 	@Override
-	public void insert(FreeBoard freeBoard) {
+	public void insert(Article freeBoard) {
 		try {
 			connect();
 			String insert = "INSERT INTO freeBoard VALUES (?,?,?,?,?,?,?)";
@@ -78,7 +78,7 @@ public class FreeBoardDAOImpl extends DAO implements ProjectDAO<FreeBoard> {
 
 	// update content
 	@Override
-	public void update(FreeBoard freeBoard) {
+	public void update(Article freeBoard) {
 		try {
 			connect();
 			String update = "UPDATE freeBoard SET freeBoard_title = ?, freeBoard_content= ? WHERE freeBoard_num= ?";
@@ -100,7 +100,7 @@ public class FreeBoardDAOImpl extends DAO implements ProjectDAO<FreeBoard> {
 
 	// delete FreeBoard
 	@Override
-	public void delete(FreeBoard freeBoard) {
+	public void delete(Article freeBoard) {
 		try {
 			connect();
 			String delete = "DELETE FROM freeBoard WHERE freeBoard_num = ?";

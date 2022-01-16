@@ -8,7 +8,7 @@ public class User {
 	private String password;
 	private String name;
 	private String phoneNum;
-	private UserGrade authority = UserGrade.NORMAL;
+	private String authority = "general";
 	
 	public User() {
 		// todo : consider setting userNum by Auto increment in database
@@ -46,16 +46,16 @@ public class User {
 	public void setPhoneNum(String phone) {
 		this.phoneNum = phone;
 	}
-	public UserGrade getAuthority() {
+	public String getAuthority() {
 		return authority;
 	}
-	public void setAuthority(UserGrade authority) {
+	public void setAuthority(String authority) {
 		this.authority = authority;
 	}
 
 	@Override
 	public String toString() {
-		return "이름 : " + name + ", 전화번호 : " + phoneNum;
+		return "ID : " + id + ", 이름 : " + name + ", 전화번호 : " + phoneNum;
 	}
 	
 	

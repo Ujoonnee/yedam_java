@@ -1,53 +1,122 @@
 package project_Yedam.VO;
 
+import java.sql.Timestamp;
+
 public class Letter {
-	
+
 	private static int serial = 0;
 	private int letterNum;
-	private String sender;
-	private String recipient;
+	private String senderId;
+	private String recipientId;
 	private String content;
-	private String timestamp;
-	
+	private long timestamp;
+	private int isRead = 0;
+
 	public Letter() {
 		serial++;
 		letterNum = serial;
+		this.timestamp = System.currentTimeMillis();
 	}
-	
+
 	public int getLetterNum() {
 		return letterNum;
 	}
+
 	public void setLetterNum(int letterNum) {
 		this.letterNum = letterNum;
 	}
-	public String getSender() {
-		return sender;
+
+	public String getSenderId() {
+		return senderId;
 	}
-	public void setSender(String sender) {
-		this.sender = sender;
+
+	public void setSenderId(String senderId) {
+		this.senderId = senderId;
 	}
-	public String getRecipient() {
-		return recipient;
+
+	public String getRecipientId() {
+		return recipientId;
 	}
-	public void setRecipient(String recipient) {
-		this.recipient = recipient;
+
+	public void setRecipientId(String recipientId) {
+		this.recipientId = recipientId;
 	}
+
 	public String getContent() {
 		return content;
 	}
+
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public String getTimestamp() {
+
+	public long getTimestamp() {
 		return timestamp;
 	}
-	public void setTimestamp(String timestamp) {
+
+	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public int isRead() {
+		return this.isRead;
+	}
+
+	public void setRead(int isRead) {
+		this.isRead = isRead;
+	}
+
+	public String printTimestamp(int select) {
+
+		String[] timeFormat = new Timestamp(this.timestamp).toString().split(" ");
+
+		if (select == 0) {
+			return timeFormat[0]; // yyyy-MM-dd
+
+		} else if (select == 1) {
+			return timeFormat[1].substring(0, 8); // HH:mm:ss
+		} else {
+			return timeFormat[0] + " " + timeFormat[1]; // yyyy-MM-dd HH:mm:ss
+		}
+	}
+
+	private String printTimestamp() {
+
+		String[] timeFormat = new Timestamp(this.timestamp).toString().split(" ");
+
+		long timeGap = System.currentTimeMillis() - this.timestamp;
+		long day = 1000 * 3600 * 24;
+
+		boolean isOver1Day = (timeGap >= day) ? true : false;
+
+		if (isOver1Day) {
+			return timeFormat[0]; // yyyy-MM-dd
+
+		} else {
+			return timeFormat[1].substring(0, 8); // HH:mm:ss
+		}
+	}
+	
+	public String getSenderName() {
+		ProjectDAO<User, String> userDao = UserDAOImpl.getInstance();
+		String senderName = userDao.selectOne(senderId).getName();
+		return senderName;
+	}
+	
+	public String getRecipientName() {
+		ProjectDAO<User, String> userDao = UserDAOImpl.getInstance();
+		String recipientName = userDao.selectOne(recipientId).getName();
+		return recipientName;
 	}
 
 	@Override
 	public String toString() {
-		return "보낸 사람 : " + sender + "\t\t받는 사람 : " + recipient + "\n보낸 시간 : " + timestamp + "\n\n" + content;
+		return "보낸 사람 : " + getSenderName() + "\t보낸 시각 : " + printTimestamp(2) + "\n\n" + content;
+				
 	}
-	
+
+	public String toList() {
+		return letterNum + ".\t" + printTimestamp() + "\t" + getSenderName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 10)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,10)) + "...\t";
+	}
+
 }
