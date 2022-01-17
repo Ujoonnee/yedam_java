@@ -35,7 +35,7 @@ public class ArticleDAOImpl extends DAO implements ProjectDAO<Article, String> {
 				article.setPosterName(rs.getString(4));
 				article.setTitle(rs.getString(5));
 				article.setContent(rs.getString(6));
-				article.setPostTime(rs.getInt(7));
+				article.setPostTime(rs.getLong(7));
 				article.setLikeNum(rs.getInt(8));
 				article.setUnlikeNum(rs.getInt(9));
 				article.setPageView(rs.getInt(10));
@@ -73,7 +73,7 @@ public class ArticleDAOImpl extends DAO implements ProjectDAO<Article, String> {
 				article.setPosterName(rs.getString(4));
 				article.setTitle(rs.getString(5));
 				article.setContent(rs.getString(6));
-				article.setPostTime(rs.getInt(7));
+				article.setPostTime(rs.getLong(7));
 				article.setLikeNum(rs.getInt(8));
 				article.setUnlikeNum(rs.getInt(9));
 				article.setPageView(rs.getInt(10));
@@ -128,12 +128,13 @@ public class ArticleDAOImpl extends DAO implements ProjectDAO<Article, String> {
 	public void update(Article article) {
 		try {
 			connect();
-			String update = "UPDATE articles SET article_title = ?, article_content= ? WHERE  article_num = ? AND board_type = ?";
+			String update = "UPDATE articles SET title = ?, content= ?, page_view = ? WHERE  article_num = ? AND board_type = ?";
 			pstmt = con.prepareStatement(update);
 			pstmt.setString(1, article.getTitle());
 			pstmt.setString(2, article.getContent());
-			pstmt.setInt(3, article.getArticleNum());
-			pstmt.setString(4, article.getBoardType());
+			pstmt.setInt(3, article.getPageView());
+			pstmt.setInt(4, article.getArticleNum());
+			pstmt.setString(5, article.getBoardType());
 
 			pstmt.executeUpdate();
 

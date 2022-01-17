@@ -56,14 +56,13 @@ public class LetterDAOImpl extends DAO implements ProjectDAO<Letter, String> {
 	public void insert(Letter letter) {
 		try {
 			connect();
-			String insert = "INSERT INTO letters VALUES (?,?,?,?,?,?)";
+			String insert = "INSERT INTO letters (sender_id, recipient_id, content, timestamp, is_read) VALUES (?,?,?,?,?)";
 			pstmt = con.prepareStatement(insert);
-			pstmt.setInt(1, letter.getLetterNum());
-			pstmt.setString(2, letter.getSenderId());
-			pstmt.setString(3, letter.getRecipientId());
-			pstmt.setString(4, letter.getContent());
-			pstmt.setLong(5, letter.getTimestamp());
-			pstmt.setInt(6, letter.isRead());
+			pstmt.setString(1, letter.getSenderId());
+			pstmt.setString(2, letter.getRecipientId());
+			pstmt.setString(3, letter.getContent());
+			pstmt.setLong(4, letter.getTimestamp());
+			pstmt.setInt(5, letter.isRead());
 
 			pstmt.executeUpdate();
 

@@ -83,20 +83,19 @@ public class UserDAOImpl extends DAO implements ProjectDAO<User, String> {
 	public void insert(User user) {
 		try {
 			connect();
-			String insert = "INSERT INTO users VALUES (?,?,?,?,?,?)";
+			String insert = "INSERT INTO users (id, password, name, phone_num, authority)VALUES (?,?,?,?,?)";
 			pstmt = con.prepareStatement(insert);
-			pstmt.setInt(1, user.getUserNum());
-			pstmt.setString(2, user.getId());
-			pstmt.setString(3, user.getPassword());
-			pstmt.setString(4, user.getName());
-			pstmt.setString(5, user.getPhone());
-			pstmt.setString(6, user.getAuthority());
+			pstmt.setString(1, user.getId());
+			pstmt.setString(2, user.getPassword());
+			pstmt.setString(3, user.getName());
+			pstmt.setString(4, user.getPhoneNum());
+			pstmt.setString(5, user.getAuthority());
 
 			pstmt.executeUpdate();
 
 		} catch (SQLException e) {
-			
 			e.printStackTrace();
+			
 		} finally {
 			disconnect();
 		}

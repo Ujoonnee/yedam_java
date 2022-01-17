@@ -116,8 +116,44 @@ public class Letter {
 				
 	}
 
-	public String toList() {
-		return letterNum + ". " + printTimestamp() + "\t" + getSenderName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 20)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,10) + "...\t");
+	public void printList(String mailboxType) {
+		
+		switch (mailboxType) {
+		case "받은쪽지함":
+			System.out.println(letterNum + ".  " + printTimestamp() + "\t" + getSenderName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 20)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,20) + "...\t"));
+			break;
+			
+		case "보낸쪽지함":
+			System.out.println(letterNum + ".  " + printTimestamp() + "\t" + getRecipientName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 20)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,20) + "...\t"));
+			break;
+			
+		default:
+			System.out.println("목록 출력 오류");
+			return;
+		}
 	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

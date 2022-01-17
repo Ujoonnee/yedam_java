@@ -18,20 +18,21 @@ public class Article {
 	private int likeNum = 0;
 	private int unlikeNum = 0;
 	private int pageView = 0;
-	
-	
+
 	// constructor
 	// todo : only Board.newArticle(), ArticleDao.selectAll() can makes articles
-	public Article() {}
+	public Article() {
+	}
+
 	public Article(String boardType) {
 		this.boardType = boardType;
 		this.postTime = System.currentTimeMillis();
 	}
-	
+
 	public int getArticleNum() {
 		return articleNum;
 	}
-	
+
 	public void setArticleNum(int articleNum) {
 		this.articleNum = articleNum;
 	}
@@ -39,7 +40,7 @@ public class Article {
 	public String getBoardType() {
 		return boardType;
 	}
-	
+
 	public void setBoardType(String boardType) {
 		this.boardType = boardType;
 	}
@@ -51,11 +52,11 @@ public class Article {
 	public void setPosterId(String posterId) {
 		this.posterId = posterId;
 	}
-	
+
 	public String getPosterName() {
 		return posterName;
 	}
-	
+
 	public void setPosterName(String posterName) {
 		this.posterName = posterName;
 	}
@@ -79,7 +80,7 @@ public class Article {
 	public long getPostTime() {
 		return postTime;
 	}
-	
+
 	public void setPostTime(long postTime) {
 		this.postTime = postTime;
 	}
@@ -107,23 +108,21 @@ public class Article {
 	public void setPageView(int pageView) {
 		this.pageView = pageView;
 	}
-	
-	
+
 	public String printPostTime(int select) {
-		
+
 		String[] timeFormat = new Timestamp(this.postTime).toString().split(" ");
-		
+
 		if (select == 0) {
-			return timeFormat[0];	// yyyy-MM-dd
-			
-		} else if (select == 1){
-			return timeFormat[1].substring(0, 8);	// HH:mm:ss
+			return timeFormat[0]; // yyyy-MM-dd
+
+		} else if (select == 1) {
+			return timeFormat[1].substring(0, 8); // HH:mm:ss
 		} else {
-			return timeFormat[0] + " " + timeFormat[1];	// yyyy-MM-dd HH:mm:ss
+			return timeFormat[0] + " " + timeFormat[1]; // yyyy-MM-dd HH:mm:ss
 		}
 	}
 
-	
 	private String printPostTime() {
 
 		String[] timeFormat = new Timestamp(this.postTime).toString().split(" ");
@@ -135,32 +134,39 @@ public class Article {
 //		System.out.println();
 		long timeGap = System.currentTimeMillis() - this.postTime;
 		long day = 1000 * 3600 * 24;
-		
-		boolean isOver1Day = (timeGap >= day)? true : false;
-		
+
+		boolean isOver1Day = (timeGap >= day) ? true : false;
+
 		if (isOver1Day) {
-			return timeFormat[0];	// yyyy-MM-dd
-			
+			return timeFormat[0]; // yyyy-MM-dd
+
 		} else {
-			return timeFormat[1].substring(0, 8);	// HH:mm:ss
+			return timeFormat[1].substring(0, 8); // HH:mm:ss
 		}
 	}
-	
-	public void toList(String boardType) {
+
+	public void toList(User loggedInUser, String boardType) {
+		
 		ProjectDAO<User, String> userDao = UserDAOImpl.getInstance();
 		String listPosterName;
+		
 		if (userDao.selectOne(posterId).getAuthority().equals("admin")) {
 			listPosterName = "공지";
 			this.posterName = "관리자";
-		} else if (boardType.equals("anonymous")) {
-			listPosterName = "김모씨";
+
+		} else if (this.posterName.equals(loggedInUser.getName()) || loggedInUser.getAuthority().equals("admin")) {
+			listPosterName = this.posterName;
+
+		} else if (boardType.equals("익명게시판")) {
+			listPosterName = "김 아무개";
 			this.posterName = listPosterName;
+
 		} else {
 			listPosterName = userDao.selectOne(posterId).getName();
 		}
-		System.out.printf("%3d. %-4s  %-20s\t   %10s   %3d\n", articleNum, listPosterName, ((title.length() < 15)? title : title.substring(0,15) + "...　"), printPostTime(), pageView);
+
+		System.out.printf("%6d.  %-4s\t%10s   %3d\t%-20s\n", articleNum, listPosterName, printPostTime(), pageView,
+				((title.length() < 15) ? title : title.substring(0, 15) + "...　"));
 	}
-	
-	
-	
+
 }
