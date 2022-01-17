@@ -2,7 +2,6 @@ package project_Yedam.VO;
 
 public class User {
 
-	private static int userSerial = 0;
 	private int userNum;
 	private String id;
 	private String password;
@@ -10,11 +9,6 @@ public class User {
 	private String phoneNum;
 	private String authority = "general";
 	
-	public User() {
-		// todo : consider setting userNum by Auto increment in database
-		userSerial++;
-		this.userNum = userSerial;
-	}
 	
 	public int getUserNum() {
 		return userNum;

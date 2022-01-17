@@ -6,18 +6,17 @@ import java.util.List;
 
 import project_Yedam.VO.Letter;
 
-public class LetterDAOImpl extends DAO implements ProjectDAO<Letter> {
+public class LetterDAOImpl extends DAO implements ProjectDAO<Letter, String> {
 
-	private static ProjectDAO<Letter> instance = new LetterDAOImpl();
+	private static ProjectDAO<Letter, String> instance = new LetterDAOImpl();
 
 	private LetterDAOImpl() {
 	}
 
-	public static ProjectDAO<Letter> getInstance() {
+	public static ProjectDAO<Letter, String> getInstance() {
 		return instance;
 	}
 
-	// show all users
 	@Override
 	public List<Letter> selectAll() {
 		List<Letter> list = new ArrayList<>();
@@ -29,79 +28,90 @@ public class LetterDAOImpl extends DAO implements ProjectDAO<Letter> {
 			
 			while (rs.next()) {
 				Letter letter = new Letter();
-				letter.setSender(rs.getString(1));
-				letter.setRecipient(rs.getString(2));
-				letter.setContent(rs.getString(3));
-				letter.setTimestamp(rs.getString(4));
+				letter.setLetterNum(rs.getInt(1));
+				letter.setSenderId(rs.getString(2));
+				letter.setRecipientId(rs.getString(3));
+				letter.setContent(rs.getString(4));
+				letter.setTimestamp(rs.getLong(5));
+				letter.setRead(rs.getInt(6));
 				
 				list.add(letter);
 			}
 
 		} catch (Exception e) {
+			System.out.println("전체 쪽지 호출 실패");
 			e.printStackTrace();
 		} finally {
 			disconnect();
 		}
 		return list;
 	}
+	
+	@Override
+	public Letter selectOne(String p) {
+		return null;
+	}
 
-	// register user
 	@Override
 	public void insert(Letter letter) {
 		try {
 			connect();
-			String insert = "INSERT INTO letters VALUES (?,?,?,?)";
+			String insert = "INSERT INTO letters VALUES (?,?,?,?,?,?)";
 			pstmt = con.prepareStatement(insert);
-			pstmt.setString(1, letter.getSender());
-			pstmt.setString(2, letter.getRecipient());
-			pstmt.setString(3, letter.getContent());
-			pstmt.setString(4, letter.getTimestamp());
-
-			int result = pstmt.executeUpdate();
-
-			System.out.println(result + "개 쪽지 보냄");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			disconnect();
-		}
-	}
-
-	// change password
-	@Override
-	public void update(Letter letter) {
-		try {
-			connect();
-			String update = "UPDATE letters SET letter_content = ? WHERE letter_no = ?";
-			pstmt = con.prepareStatement(update);
-			pstmt.setString(1, letter.getContent());
-			pstmt.setInt(2, letter.getLetterNum());
+			pstmt.setInt(1, letter.getLetterNum());
+			pstmt.setString(2, letter.getSenderId());
+			pstmt.setString(3, letter.getRecipientId());
+			pstmt.setString(4, letter.getContent());
+			pstmt.setLong(5, letter.getTimestamp());
+			pstmt.setInt(6, letter.isRead());
 
 			pstmt.executeUpdate();
 
 		} catch (SQLException e) {
+			System.out.println("쪽지 발송 실패");
 			e.printStackTrace();
 		} finally {
 			disconnect();
 		}
 	}
 
-	// delete user
+	@Override
+	public void update(Letter letter) {
+		try {
+			connect();
+			String update = "UPDATE letters SET is_read = ? WHERE timestamp = ?";
+			pstmt = con.prepareStatement(update);
+			pstmt.setInt(1, 1);
+			pstmt.setLong(2, letter.getTimestamp());
+
+			pstmt.executeUpdate();
+
+		} catch (SQLException e) {
+			System.out.println("쪽지 수정 실페");
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
+	}
+
 	@Override
 	public void delete(Letter letter) {
 		try {
 			connect();
-			String delete = "DELETE FROM letters WHERE letter_no = ?";
+			String delete = "DELETE FROM letters WHERE timestamp = ?";
 			pstmt = con.prepareStatement(delete);
-			pstmt.setInt(1, letter.getLetterNum());
+			pstmt.setLong(1, letter.getTimestamp());
+			System.out.println(letter.getTimestamp());
+			pstmt.executeUpdate();
 
-			int result = pstmt.executeUpdate();
-
-			System.out.println(result + "명 삭제");
 		} catch (SQLException e) {
+			System.out.println("쪽지 삭제 실패");
 			e.printStackTrace();
+		} finally {
+			disconnect();
 		}
 
 	}
+
+
 }

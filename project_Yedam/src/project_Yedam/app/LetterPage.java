@@ -1,8 +1,15 @@
-package project_Yedam.VO;
+package project_Yedam.app;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import project_Yedam.VO.Letter;
+import project_Yedam.VO.MailboxType;
+import project_Yedam.VO.User;
+import project_Yedam.dao.LetterDAOImpl;
+import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.UserDAOImpl;
 
 public class LetterPage {
 
@@ -20,9 +27,9 @@ public class LetterPage {
 		
 		int menu = 0;
 		System.out.println();
-		System.out.println("┌───────────┬────────────┬────────────┬────────────┬────────────┐");
+		System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
 		System.out.println("│ 1.사용자검색	│ 2.쪽지보내기	 │ㅤ3.받은쪽지함ㅤ│ㅤ4.보낸쪽지함ㅤ│　 9.이전메뉴  │");
-		System.out.println("└───────────┴────────────┴────────────┴────────────┴────────────┘");
+		System.out.println("└───────────┴─────────────────────┴────────────────────────┴────────────┘");
 		System.out.print("메뉴\n> ");
 		
 		menu = Integer.parseInt(sc.nextLine());
@@ -68,7 +75,7 @@ public class LetterPage {
 		}
 		
 		letterDao.insert(letter);
-		System.out.println("쪽지를 보냈습니다.");
+		System.out.println("쪽지를 보냈습니다.\n");
 		
 	}
 	
@@ -78,15 +85,15 @@ public class LetterPage {
 			reply.setSenderId(loggedInUser.getId());
 	
 			// setRecipientId()
-			letter.setRecipientId(letter.getSenderId());
+			reply.setRecipientId(letter.getSenderId());
 			
 			// setContent()
-			if (newContent(letter) == null) {
+			if (newContent(reply) == null) {
 				return;	// canceled sendLetter in newContent()
 			}
 			
-			letterDao.insert(letter);
-			System.out.println("쪽지를 보냈습니다.");
+			letterDao.insert(reply);
+			System.out.println("쪽지를 보냈습니다.\n");
 			
 		}
 	
@@ -107,8 +114,8 @@ public class LetterPage {
 				if (input.equals("작성종료") || input.equals("행삭제")) {
 					if (lines.size() == 0) {
 						System.out.println("\n작성을 종료합니다.");
-						letter.setContent(content);
-						return letter;
+//						letter.setContent(content);
+						return null;
 						
 					} else if (input.equals("작성종료")) {
 						// confirmation
@@ -123,8 +130,11 @@ public class LetterPage {
 								continue;
 							}
 							if (menu == 1) {
-								letter.setContent(content);
 								System.out.println("\n작성을 완료합니다.");
+								for (String string : lines) {
+									content += string;
+								}
+								letter.setContent(content);
 								return letter;
 								
 							} else if (menu == 2) {
@@ -175,9 +185,10 @@ public class LetterPage {
 	
 	public int printLetterBoxMenu() {
 		
-		System.out.println("┌───────────┬────────────┬────────────┬────────────┐");
-		System.out.println("│ 1.전체쪽지	│ 2.이름검색	 │  3.내용검색	  │ㅤ 9.이전메뉴  │");
-		System.out.println("└───────────┴────────────┴────────────┴────────────┘");
+		System.out.println();
+		System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
+		System.out.println("    1.전체쪽지    2.이름검색     3.내용검색    ㅤ 9.이전메뉴    ");
+		System.out.println("└───────────┴─────────────────────┴────────────────────────┴────────────┘");
 		System.out.print("메뉴 선택\n> ");
 		
 		int menu = Integer.parseInt(sc.nextLine());
@@ -197,7 +208,7 @@ public class LetterPage {
 				letters = printAllReceivedLetters(loggedInUser, letterList);
 				break;
 			case 2:
-				letters = searchName(loggedInUser, letterList);
+				letters = searchSender(loggedInUser, letterList);
 				break;
 			case 3:
 				letters = searchRecievedContent(loggedInUser, letterList);
@@ -213,25 +224,40 @@ public class LetterPage {
 				letters = searchRecipient(loggedInUser, letterList);
 				break;
 			case 3:
-				letters = searchRecievedContent(loggedInUser, letterList);
+				letters = searchSentContent(loggedInUser, letterList);
 			}
 			
 		}
-
-		readLetter(loggedInUser, letters);
+		
+		if (letters.size() == 0 || letters == null) {
+			System.out.println("쪽지가 없습니다.");
+		} else {
+			readLetter(loggedInUser, letters);
+		}
+	}
+	
+	List<Letter> checkListNull(List<Letter> letters) {
+		if (letters.size() == 0) {
+			System.out.println("쪽지가 없습니다.");
+			return null;
+		} else {
+			return letters;
+		}
 	}
 	
 	List<Letter> printAllReceivedLetters(User loggedInUser, List<Letter> letterList) {
 		
 		List<Letter> allLetters = new ArrayList<>();
 		
+		int listNum = 1;
 		for (Letter letter : letterList) {
-			int listNum = 1;
 			if (letter.getRecipientId().equals(loggedInUser.getId())) {
 				letter.setLetterNum(listNum);
 				allLetters.add(letter);
 				listNum++;
-				
+				if (letter.getContent() == null) {
+					letter.setContent("쪽지 내용 작성 중 오류가 발생했습니다.");
+				}
 				System.out.println(letter.toList());
 			}
 		}
@@ -240,16 +266,15 @@ public class LetterPage {
 		return allLetters;
 	}
 	
-	List<Letter> searchName(User loggedInUser, List<Letter> letterList) {
+	List<Letter> searchSender(User loggedInUser, List<Letter> letterList) {
 		
 		List<Letter> letters = new ArrayList<>();
 		
 		System.out.print("이름을 입력하세요.\n> ");
 		String name = sc.nextLine();
 		
+		int listNum = 1;
 		for (Letter l : letterList) {
-			int listNum = 1;
-			
 			if (l.getSenderName().equals(name) && l.getRecipientId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);
@@ -261,7 +286,6 @@ public class LetterPage {
 		System.out.println();
 		
 		return letters;
-		
 	}
 	
 	List<Letter> searchRecievedContent(User loggedInUser, List<Letter> letterList) {
@@ -271,9 +295,8 @@ public class LetterPage {
 		System.out.print("내용을 입력하세요.\n> ");
 		String content = sc.nextLine();
 		
+		int listNum = 1;
 		for (Letter l : letterList) {
-			int listNum = 1;
-			
 			if (l.getContent().contains(content) && l.getRecipientId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);
@@ -292,9 +315,9 @@ public class LetterPage {
 		int menu = 0;
 		
 		while (true) {
-			System.out.println("┌───────────┬────────────┐");
-			System.out.println("│ 1.쪽지읽기	│  9.이전메뉴  │");
-			System.out.println("└───────────┴────────────┘");
+			System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
+			System.out.println(" 1.쪽지읽기	  9.이전메뉴  ");
+			System.out.println("└───────────┴─────────────────────┴────────────────────────┴────────────┘");
 			
 			try {
 				System.out.print("메뉴 선택\n> ");
@@ -315,11 +338,14 @@ public class LetterPage {
 							if (l.getLetterNum() == menu) {
 								letterDao.update(l);
 								letter = l;
-								
 							}
+						}
+						if (letter == null) {
+							System.err.println("잘못 입력하셨습니다.");
 						}
 						System.out.println(letter);
 						followUpMenu(loggedInUser, letter);
+						break;
 						
 					} catch (Exception e) {
 						System.err.println("\n잘못 입력하셨습니다.\n");
@@ -337,9 +363,9 @@ public class LetterPage {
 	void followUpMenu(User loggedInUser, Letter letter) {
 		
 		while (true) {
-			System.out.println("┌───────────┬────────────┬────────────┐");
+			System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
 			System.out.println("│ 1.답장하기	│ 2.삭제하기	 │ㅤ 9.이전메뉴  │");
-			System.out.println("└───────────┴────────────┴────────────┘");
+			System.out.println("└───────────┴─────────────────────┴────────────────────────┴────────────┘");
 			
 			int menu = 0;
 			try {
@@ -353,6 +379,7 @@ public class LetterPage {
 			
 			if (menu == 1) {	// reply
 				sendLetter(loggedInUser, letter);
+				return;
 
 			} else if(menu == 2) {
 				System.out.println("삭제 후에는 복구할 수 없습니다. 삭제하시겠습니까?");
@@ -372,6 +399,7 @@ public class LetterPage {
 					if (select == 1) {
 						letterDao.delete(letter);
 						System.out.println("\n삭제되었습니다.");
+						return;
 
 					} else if (select == 9) {
 						System.out.println("\n이전 메뉴로 돌아갑니다.");
@@ -397,8 +425,8 @@ public class LetterPage {
 		
 		List<Letter> allLetters = new ArrayList<>();
 		
+		int listNum = 1;
 		for (Letter letter : letterList) {
-			int listNum = 1;
 			if (letter.getSenderId().equals(loggedInUser.getId())) {
 				letter.setLetterNum(listNum);
 				allLetters.add(letter);
@@ -419,9 +447,8 @@ public class LetterPage {
 		System.out.print("이름을 입력하세요.\n> ");
 		String name = sc.nextLine();
 		
+		int listNum = 1;
 		for (Letter l : letterList) {
-			int listNum = 1;
-			
 			if (l.getRecipientName().equals(name) && l.getSenderId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);
@@ -443,9 +470,8 @@ public class LetterPage {
 		System.out.print("내용을 입력하세요.\n> ");
 		String content = sc.nextLine();
 		
+		int listNum = 1;
 		for (Letter l : letterList) {
-			int listNum = 1;
-			
 			if (l.getContent().contains(content) && l.getRecipientId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);

@@ -10,7 +10,7 @@ public class DAO {
 
 	// DB 연결정보
 	private String jdbc_driver = "org.sqlite.JDBC";
-	private String jdbc_url = "jdbc:sqlite:/C:/Users/admin/Desktop/JAVA/SQLite/YedamDataBase.db";
+	private String jdbc_url = "jdbc:sqlite:/C:/Users/admin/git/yedam/project_Yedam/ProjectYedam.db";
 	
 	// 각 메서드 공통필드
 	protected Connection con = null;

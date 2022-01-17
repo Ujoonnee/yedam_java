@@ -2,12 +2,15 @@ package project_Yedam.VO;
 
 import java.sql.Timestamp;
 
+import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.UserDAOImpl;
+
 public class Article {
 
 	// field
 	private int articleNum;
 	private String boardType;
-	private String posterId;					// userId
+	private String posterId;
 	private String posterName;
 	private String title;
 	private String content;
@@ -19,10 +22,8 @@ public class Article {
 	
 	// constructor
 	// todo : only Board.newArticle(), ArticleDao.selectAll() can makes articles
-	Article() {}
-	Article(String boardType, int articleNum) {
-		// todo : consider setting articleNum by Auto increment in database
-		this.articleNum = articleNum;
+	public Article() {}
+	public Article(String boardType) {
 		this.boardType = boardType;
 		this.postTime = System.currentTimeMillis();
 	}
@@ -126,7 +127,12 @@ public class Article {
 	private String printPostTime() {
 
 		String[] timeFormat = new Timestamp(this.postTime).toString().split(" ");
-		
+//		System.out.println();
+//		System.out.println(System.currentTimeMillis());
+//		System.out.println(this.postTime);
+//		System.out.println(timeFormat[0]);
+//		System.out.println(timeFormat[1].substring(0, 8));
+//		System.out.println();
 		long timeGap = System.currentTimeMillis() - this.postTime;
 		long day = 1000 * 3600 * 24;
 		
@@ -140,11 +146,19 @@ public class Article {
 		}
 	}
 	
-	
-	@Override
-	public String toString() {
+	public void toList(String boardType) {
 		ProjectDAO<User, String> userDao = UserDAOImpl.getInstance();
-		return "번호 : " + articleNum + "	작성자 : " + userDao.selectOne(posterId).getName() + " 제목 : " + title + "	작성일 : " + printPostTime() + "	조회수 : " + pageView;
+		String listPosterName;
+		if (userDao.selectOne(posterId).getAuthority().equals("admin")) {
+			listPosterName = "공지";
+			this.posterName = "관리자";
+		} else if (boardType.equals("anonymous")) {
+			listPosterName = "김모씨";
+			this.posterName = listPosterName;
+		} else {
+			listPosterName = userDao.selectOne(posterId).getName();
+		}
+		System.out.printf("%3d. %-4s  %-20s\t   %10s   %3d\n", articleNum, listPosterName, ((title.length() < 15)? title : title.substring(0,15) + "...　"), printPostTime(), pageView);
 	}
 	
 	

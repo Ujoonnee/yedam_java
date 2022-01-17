@@ -1,7 +1,13 @@
-package project_Yedam.VO;
+package project_Yedam.app;
 
 import java.util.List;
 import java.util.Scanner;
+
+import project_Yedam.VO.Letter;
+import project_Yedam.VO.User;
+import project_Yedam.dao.LetterDAOImpl;
+import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.UserDAOImpl;
 
 public class LogInPage {
 	
@@ -16,9 +22,9 @@ public class LogInPage {
 
 	public int showMenu() {
 
-		System.out.println("┌───────────┬────────────┬────────────┐");
-		System.out.println("│  1.로그인	   2.회원가입	 	　9.종료　　 │");
-		System.out.println("└───────────┴────────────┴────────────┘");
+		System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
+		System.out.println("        1.로그인                 2.회원가입                   9.종료         ");
+		System.out.println("└─────────────────────┴─────────────────────────┴───────────────────────┘");
 		while (true) {
 			int menu = 0;
 			try {
@@ -72,7 +78,7 @@ public class LogInPage {
 			for (User user : userList) {
 				if (user.getId().equals(userId) && user.getPassword().equals(userPw)) {
 					logInUser = user;
-					System.out.println("\n로그인 성공");
+					System.out.println("로그인 성공\n");
 					return logInUser;
 				}
 			}
@@ -114,7 +120,7 @@ public class LogInPage {
 			System.out.print("\nID를 입력하세요.\n> ");
 			String id = null;
 			try {
-				id = sc.next();
+				id = sc.nextLine();
 				Integer.parseInt(id);
 				System.err.println("ID는 숫자로만 이루어질 수 없습니다.");
 				continue;
@@ -128,14 +134,14 @@ public class LogInPage {
 		// password validation
 		while (true) {
 			System.out.print("\n비밀번호를 입력하세요.\n> ");
-			String pw1 = sc.next();
+			String pw1 = sc.nextLine();
 			if (pw1.length() < 4) {
 				System.err.println("\n비밀번호는 4글자 이상이어야 합니다.");
 				continue;
 			}
 
 			System.out.print("\n비밀번호 확인\n> ");
-			String pw2 = sc.next();
+			String pw2 = sc.nextLine();
 			if (pw1.equals(pw2)) {
 				newUser.setPassword(pw2);
 				break;
@@ -148,7 +154,7 @@ public class LogInPage {
 			System.out.print("\n이름을 입력하세요.\n> ");
 			String name = null;
 			try {
-				name = sc.next();
+				name = sc.nextLine();
 				Integer.parseInt(name);
 				System.err.println("ID는 숫자로만 이루어질 수 없습니다.");
 				continue;
@@ -161,7 +167,7 @@ public class LogInPage {
 		// phone number validation
 		while (true) {
 			System.out.print("\n전화번호를 입력하세요( \"-\" 제외 ).\n> ");
-			String phoneNum = sc.next();
+			String phoneNum = sc.nextLine();
 
 			try {
 				Integer.parseInt(phoneNum);
@@ -171,18 +177,23 @@ public class LogInPage {
 			}
 
 			newUser.setPhoneNum(phoneNum);
-
-			userDao.insert(newUser);
-			System.out.println("회원가입을 축하합니다.🎉🎉");
+			try {
+				userDao.insert(newUser);
+				
+			} catch (Exception e) {
+				System.out.println("DB 등록 실패");
+				break;
+			}
+			System.out.println("\n회원가입을 축하합니다.🎉🎉\n");
 			break;
 		}
 	}
 
 	public int afterLogin() {
 
-		System.out.println("┌───────────┬────────────┬────────────┬────────────┐");
-		System.out.println("│ 1.자유게시판	│ 2.익명게시판	 │	 3.쪽지함	  │　 9.로그아웃  │");
-		System.out.println("└───────────┴────────────┴────────────┴────────────┘");
+		System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
+		System.out.println("│	1.자유게시판	2.익명게시판	3.쪽지함	9.로그아웃	│");
+		System.out.println("└─────────────────────┴─────────────────────────┴───────────────────────┘");
 
 		int menu;
 		while (true) {

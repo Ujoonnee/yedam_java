@@ -2,9 +2,11 @@ package project_Yedam.VO;
 
 import java.sql.Timestamp;
 
+import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.UserDAOImpl;
+
 public class Letter {
 
-	private static int serial = 0;
 	private int letterNum;
 	private String senderId;
 	private String recipientId;
@@ -13,9 +15,8 @@ public class Letter {
 	private int isRead = 0;
 
 	public Letter() {
-		serial++;
-		letterNum = serial;
 		this.timestamp = System.currentTimeMillis();
+//		System.out.println(this.timestamp);
 	}
 
 	public int getLetterNum() {
@@ -82,7 +83,7 @@ public class Letter {
 
 	private String printTimestamp() {
 
-		String[] timeFormat = new Timestamp(this.timestamp).toString().split(" ");
+		String[] timeFormat = new Timestamp(this.timestamp).toString().split(" "); // [0] : yyyy-MM-dd, [1] : HH:mm:ss
 
 		long timeGap = System.currentTimeMillis() - this.timestamp;
 		long day = 1000 * 3600 * 24;
@@ -116,7 +117,7 @@ public class Letter {
 	}
 
 	public String toList() {
-		return letterNum + ".\t" + printTimestamp() + "\t" + getSenderName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 10)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,10)) + "...\t";
+		return letterNum + ". " + printTimestamp() + "\t" + getSenderName() + ((isRead == 0) ? "\t읽지않음\t" : "\t읽음\t") + ((content.replace("\n", " ").length() < 20)? content.replace("\n", " ") : content.replace("\n", " ").substring(0,10) + "...\t");
 	}
 
 }

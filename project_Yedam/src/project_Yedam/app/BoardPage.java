@@ -1,8 +1,15 @@
-package project_Yedam.VO;
+package project_Yedam.app;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import project_Yedam.VO.Article;
+import project_Yedam.VO.BoardType;
+import project_Yedam.VO.User;
+import project_Yedam.dao.ArticleDAOImpl;
+import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.UserDAOImpl;
 
 public class BoardPage {
 
@@ -18,8 +25,8 @@ public class BoardPage {
 	private ProjectDAO<Article, String> articleDao = ArticleDAOImpl.getInstance();
 	private ProjectDAO<User, String> userDao = UserDAOImpl.getInstance();
 
-	private static int freeBoardSerial = 0;
-	private static int anonymousBoardSerial = 0;
+//	private static int freeBoardSerial = 0;
+//	private static int anonymousBoardSerial = 0;
 
 	
 	// methods
@@ -39,61 +46,67 @@ public class BoardPage {
 	public void showArticleList(String boardType) {
 
 		List<Article> articleList = articleDao.selectAll();
-		System.out.println();
 
 		try {
 			switch (boardType) {
 			case "free":
-				// administrator notice list
-				for (Article article : articleList) {
-					if (userDao.selectOne(article.getPosterId()).getAuthority().equals("admin")) {
-						System.out.println(article);
-					}
-				}
+				System.out.println("\n============================== 자유게시판 ===============================\n");
+				System.out.printf("%3s %-4s %10s%-10s\t\t   %4s%-5s   %-3s\n", "번호", " 이름", "제", "목", "날", "짜", "추천수");
 				
-				// general user article list
-				for (Article article : articleList) {
-					if (userDao.selectOne(article.getPosterId()).getAuthority().equals("general")) {
-						System.out.println(article);
-					}
-				}
+				printArticleList(articleList, "admin", boardType);		// admin article
+				System.out.println("------------------------------------------------------------------------");
+				printArticleList(articleList, "general", boardType);	// general article
+				
 				break;
 				
 			case "anonymous":
-				// administrator notice list
-				for (Article article : articleList) {
-					if (userDao.selectOne(article.getPosterId()).getAuthority().equals("admin")) {
-						userDao.selectOne(article.getPosterId()).setName("🤐");
-						System.out.println(article);
-					}
-				}
+				System.out.println("\n============================== 익명게시판 ===============================\n");
+				System.out.printf("%3s %-4s %10s%-10s\t   %4s%-5s   %-3s\n", "글번호", " 이름", "제", "목", "날", "짜", "추천수");
 				
-				// general user article list
-				for (Article article : articleList) {
-					if (userDao.selectOne(article.getPosterId()).getAuthority().equals("general")) {
-						userDao.selectOne(article.getPosterId()).setName("🤐");
-						System.out.println(article);
-					}
-				}
+				printArticleList(articleList, "admin", boardType);
+				System.out.println("------------------------------------------------------------------------");
+				printArticleList(articleList, "general", boardType);	
 			}
 				
 		}  catch (Exception e) {
 			System.out.println("error from BoardPage.showArticleList()\n");
 		}
 	}
+	
+	void printArticleListFormat(List<Article> articleList, String authority, String boardType) {
+		System.out.println("\n============================== 자유게시판 ===============================\n");
+		System.out.printf("%3s %-4s %10s%-10s\t\t   %4s%-5s   %-3s\n", "번호", " 이름", "제", "목", "날", "짜", "추천수");
+		
+		printArticleList(articleList, authority, boardType);		// admin article
+		System.out.println("------------------------------------------------------------------------");
+		printArticleList(articleList, authority, boardType);	// general article
+	}
+	
+	void printArticleList(List<Article> articleList, String authority, String boardType) {
+		for (Article article : articleList) {
+			if (userDao.selectOne(article.getPosterId()).getAuthority().equals(authority) && article.getBoardType().equals(boardType)) {
+				article.toList(boardType);
+			}
+		}
+	}
 
+	
+	
+	
 	public int printMenu() {
 
 		System.out.println();
-		System.out.println("┌──────────┬──────────┬──────────┬──────────┬──────────┐");
-		System.out.println("│　　1.읽기 　　 2.새글작성　　　3.수정　　 　　4.삭제　　 9.이전메뉴　│");
-		System.out.println("└──────────┴──────────┴──────────┴──────────┴──────────┘");
+		System.out.println("┌─────────────────────┬─────────────────────────┬───────────────────────┐");
+		System.out.println("      　　1.읽기 　　 2.새글작성　　　3.수정　　 　　4.삭제　　 9.이전메뉴　      ");
+		System.out.println("└─────────────────────┴─────────────────────────┴───────────────────────┘");
 
 		int menu;
 		while (true) {
 			try {
 				System.out.print("메뉴 선택\n> ");
-				menu = Integer.parseInt(sc.nextLine());
+				String input = null;
+				input = sc.nextLine();
+				menu = Integer.parseInt(input);
 
 			} catch (Exception e) {
 				System.err.println("\n잘못 입력하셨습니다.\n");
@@ -117,21 +130,26 @@ public class BoardPage {
 	}
 
 	public void printArticle(User loggedInUser, Article article, String boardType) {
-
-		// print selected article
-		System.out.println("\n");
-		System.out.println("제목\t" + article.getTitle());
-
-		// show userName only for administrator and my article
-		User poster = userDao.selectOne(article.getPosterId());
-		if (boardType.equals("anonymous") && !(loggedInUser.getAuthority().equals("admin")
-				|| article.getPosterId().equals(loggedInUser.getId()))) {
-			poster.setName("🤐");
+		
+		try {
+			// print selected article
+			System.out.println("\n--------------------------------------------------------------");
+			System.out.println("제목\t" + article.getTitle());
+			
+			// show userName only for administrator and my article
+			User poster = userDao.selectOne(article.getPosterId());
+			if (boardType.equals("anonymous") && !(loggedInUser.getAuthority().equals("admin")
+					|| article.getPosterId().equals(loggedInUser.getId()))) {
+				poster.setName("🤐");
+			}
+			
+			System.out.println("작성자\t" + poster.getName() + "\t\t작성일\t" + article.printPostTime(3));
+			System.out.println("\n" + article.getContent());
+			System.out.println("\n추천 [ " + article.getLikeNum() + " ]\t비추천 [ " + article.getUnlikeNum() + " ]");
+			System.out.println("--------------------------------------------------------------");
+		} catch (Exception e) {
+			System.out.println("잘못 선택하셨습니다.");
 		}
-
-		System.out.println("작성자\t" + poster.getName() + "\t\t작성일\t" + article.printPostTime(3));
-		System.out.println("\n" + article.getContent());
-		System.out.println("\n추천 [ " + article.getLikeNum() + " ]\t비추천 [ " + article.getUnlikeNum() + " ]");
 
 	}
 
@@ -150,50 +168,63 @@ public class BoardPage {
 		switch (boardType) {
 		case "free": // need boardType, articleNum, poster, title, content, postTime
 
-			// boardType, articleNum, postTime by constructor
-			freeBoardSerial++;
-			Article articleFB = new Article("free", freeBoardSerial);
-
-			// poster
-			articleFB.setPosterId(loggedInUser.getId());
-			articleFB.setPosterName(loggedInUser.getName());
-
-			// articleFB.setTitle();
-			if (newTitle(articleFB) == null) {
-				return; // canceled newArticle in newTitle()
-			}
-			System.out.println();
+			try {
+				// boardType, articleNum, postTime by constructor
+	//			freeBoardSerial++;
+				Article articleFB = new Article(boardType);
+	
+				// poster
+				articleFB.setPosterId(loggedInUser.getId());
+				articleFB.setPosterName(loggedInUser.getName());
+	
+				// articleFB.setTitle();
+				if (newTitle(articleFB) == null) {
+					return; // canceled newArticle in newTitle()
+				}
+				System.out.println();
+				
+				// articleFB.setContent();
+				if (newContent(articleFB) == null) {
+					return; // canceled newArticle in newContent()
+				}
 			
-			// articleFB.setContent();
-			if (newContent(articleFB) == null) {
-				return; // canceled newArticle in newContent()
+				articleDao.insert(articleFB);
+				System.out.println("새 글이 등록되었습니다.");
+				
+			} catch (Exception e) {
+				System.err.println("새 글 작성 중 오류가 발생했습니다.");
 			}
-
-			articleDao.insert(articleFB);
 
 			break;
 
 		case "anonymous": // need boardType, articleNum, poster, title, content, postTime
-
-			// boardType, articleNum, postTime by constructor
-			anonymousBoardSerial++;
-			Article articleAB = new Article("anonymous", anonymousBoardSerial);
-
-			// poster
-			articleAB.setPosterId(loggedInUser.getId());
-			articleAB.setPosterName(loggedInUser.getName());
 			
-			// articleAB.setTitle();
-			if (newTitle(articleAB) == null) {
-				return; // canceled newArticle in newTitle()
+			try {
+				// boardType, articleNum, postTime by constructor
+//			anonymousBoardSerial++;
+				Article articleAB = new Article(boardType);
+				
+				// poster
+				articleAB.setPosterId(loggedInUser.getId());
+				articleAB.setPosterName(loggedInUser.getName());
+				
+				// articleAB.setTitle();
+				if (newTitle(articleAB) == null) {
+					return; // canceled newArticle in newTitle()
+				}
+				System.out.println();
+				
+				// articleAB.setContent();
+				if (newContent(articleAB) == null) {
+					return; // canceled newArticle in newContent()
+				}
+				
+				articleDao.insert(articleAB);
+				System.out.println("새 글이 등록되었습니다.");
+				
+			} catch (Exception e) {
+				System.err.println("새 글 작성 중 오류가 발생했습니다.");
 			}
-
-			// articleAB.setContent();
-			if (newContent(articleAB) == null) {
-				return; // canceled newArticle in newContent()
-			}
-
-			articleDao.insert(articleAB);
 
 			break;
 
@@ -270,8 +301,10 @@ public class BoardPage {
 								continue;
 							}
 							if (menu == 1) {
+								for (String string : lines) {
+									content += string;
+								}
 								article.setContent(content);
-								articleDao.insert(article);
 								System.out.println("\n작성을 완료합니다.");
 								return article;
 
