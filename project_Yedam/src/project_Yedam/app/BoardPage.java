@@ -9,6 +9,8 @@ import project_Yedam.VO.BoardType;
 import project_Yedam.VO.User;
 import project_Yedam.dao.ArticleDAOImpl;
 import project_Yedam.dao.ProjectDAO;
+import project_Yedam.dao.Updown;
+import project_Yedam.dao.UpdownDAOImpl;
 import project_Yedam.dao.UserDAOImpl;
 
 public class BoardPage {
@@ -129,7 +131,7 @@ public class BoardPage {
 		System.out.println();
 //		System.out.println("┌───────────────────────────────────────────────────────────────────────┐");
 		System.out.println("      1.읽기       2.새 글 작성       3.수정        4.삭제       9.이전메뉴      ");
-		System.out.println("└───────────────────────────────────────────────────────────────────────┘");
+		System.out.println("└─────────────────────────────────────────────────────────────────────────┘");
 
 		int menu;
 		while (true) {
@@ -167,11 +169,27 @@ public class BoardPage {
 		try {
 			// pageView++
 			article.setPageView(article.getPageView() + 1);
-			
 			articleDao.update(article);
-
+			
+			ProjectDAO<Updown, String> updownDao = UpdownDAOImpl.getInstance();
+			List<Updown> list = updownDao.selectAll();
+			Updown updown = new Updown(article.getArticleNum(), loggedInUser.getId(), boardType);
+			
+			// 기존재 여부 확인필
+			for (Updown u : list) {
+				if (!(u.getArticleNum() == updown.getArticleNum() && u.getUserId().equals(updown.getUserId()) && u.getBoardType().equals(boardType))) {
+					updownDao.insert(updown);
+				}
+			}
+			
 			// print selected article
 			printArticle(article);
+			
+			// 좋아요 싫어요
+			
+			printThumbsMenu(article);
+			
+			
 			
 		} catch (Exception e) {
 			System.err.println("잘못 선택하셨습니다.");
@@ -179,14 +197,84 @@ public class BoardPage {
 
 	}
 	
+	void printThumbsMenu(Article article) {
+		
+		System.out.println("              1.추천               2.비추천             9.이전메뉴            ");
+		System.out.println("└───────────────────────────────────────────────────────────────────────┘");
+		System.out.println("\n>> ");
+		
+		int input = Integer.parseInt(sc.nextLine());
+		
+		ProjectDAO<Updown, String> updownDao = UpdownDAOImpl.getInstance();
+		List<Updown> list = updownDao.selectAll();
+		
+		Updown updown = null;
+		for (Updown u : list) {
+			if ((u.getArticleNum() == article.getArticleNum()) && u.getUserId().equals(loggedInUser.getId())) {
+				updown = u;
+			}
+		}
+		if (updown == null) updown = new Updown(article.getArticleNum(), loggedInUser.getId(), boardType);
+		
+		
+		if (input == 1) {
+			if (updown.getUp() == 0) {
+				updown.setUp(1);
+				article.setLikeNum(article.getLikeNum() + 1);
+				articleDao.update(article);
+				updownDao.update(updown);
+				
+				System.out.println("\n추천을 눌렀습니다.\n");
+				
+			} else if (updown.getUp() == 1) {
+				updown.setUp(0);
+				article.setLikeNum(article.getLikeNum() - 1);
+				articleDao.update(article);
+				updownDao.update(updown);
+
+				System.out.println("\n추천을 취소했습니다.\n");
+			}
+			
+		} else if (input == 2) {
+			if (updown.getDown() == 0) {
+				updown.setDown(1);
+				article.setUnlikeNum(article.getUnlikeNum() + 1);
+				articleDao.update(article);
+				updownDao.update(updown);
+				
+				console.clear();
+				System.out.println("\n비추천을 눌렀습니다.\n");
+				return;
+				
+			} else if (updown.getDown() == 1) {
+				updown.setUp(0);
+				article.setUnlikeNum(article.getUnlikeNum() - 1);
+				articleDao.update(article);
+				updownDao.update(updown);
+				
+				console.clear();
+				System.out.println("\n비추천을 취소했습니다.\n");
+				return;
+				
+			}
+			
+		} else if (input == 9) {
+			console.clear();
+			System.out.println("이전 메뉴로 이동합니다.\n");
+			return;
+			
+		}
+		
+	}
+	
 	void printArticle(Article article) {
 		
-		System.out.println("\n┌──────────────────────────────── 글 읽기 ─────────────────────────────────┐\n");
+		System.out.println("\n┌──────────────────────────────── 글 읽기 ────────────────────────────────┐\n");
 		System.out.println("제목\t" + article.getTitle());
 
 		// show userName only for administrator and my article
 		User poster = userDao.selectOne(article.getPosterId());
-		if (boardType.equals("익명") && !(loggedInUser.getAuthority().equals("admin")
+		if (boardType.equals("익명게시판") && !(loggedInUser.getAuthority().equals("admin")
 				|| article.getPosterId().equals(loggedInUser.getId()))) {
 			poster.setName("김 아무개");
 		}
@@ -216,9 +304,9 @@ public class BoardPage {
 		
 		console.clear();
 		
-		System.out.println("\n┌────────────────────────────── 새 글 작성 ────────────────────────────────┐\n");
+		System.out.println("\n┌────────────────────────────── 새 글 작성 ───────────────────────────────┐\n");
 		switch (boardType) {
-		case "자유": // need boardType, articleNum, poster, title, content, postTime
+		case "자유게시판": // need boardType, articleNum, poster, title, content, postTime
 
 			try {
 				// boardType, articleNum, postTime by constructor
@@ -228,7 +316,7 @@ public class BoardPage {
 				// poster
 				articleFB.setPosterId(loggedInUser.getId());
 				articleFB.setPosterName(loggedInUser.getName());
-
+				
 				// articleFB.setTitle();
 				if (newTitle(articleFB) == null) {
 					return; // canceled newArticle in newTitle()
@@ -249,7 +337,7 @@ public class BoardPage {
 
 			break;
 
-		case "익명": // need boardType, articleNum, poster, title, content, postTime
+		case "익명게시판": // need boardType, articleNum, poster, title, content, postTime
 
 			try {
 				// boardType, articleNum, postTime by constructor

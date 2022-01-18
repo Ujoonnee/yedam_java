@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import project_Yedam.VO.Letter;
 import project_Yedam.VO.User;
-import project_Yedam.dao.LetterDAOImpl;
+import project_Yedam.dao.ReceivedLetterDAOImpl;
 import project_Yedam.dao.ProjectDAO;
 import project_Yedam.dao.UserDAOImpl;
 
@@ -110,7 +110,7 @@ public class LogInPage {
 	public void printWelcome(User loggedInUser) {
 		System.out.printf("%33s%-1s", "안녕하세요, ", loggedInUser.getName() + "님 :)\n");
 
-		ProjectDAO<Letter, String> letterDao = LetterDAOImpl.getInstance();
+		ProjectDAO<Letter, String> letterDao = ReceivedLetterDAOImpl.getInstance();
 		List<Letter> letters = letterDao.selectAll();
 		int count = 0;
 		for (Letter l : letters) {

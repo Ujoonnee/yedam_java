@@ -7,7 +7,8 @@ import java.util.Scanner;
 import project_Yedam.VO.Letter;
 import project_Yedam.VO.MailboxType;
 import project_Yedam.VO.User;
-import project_Yedam.dao.LetterDAOImpl;
+import project_Yedam.dao.ReceivedLetterDAOImpl;
+import project_Yedam.dao.SentLetterDAOImpl;
 import project_Yedam.dao.ProjectDAO;
 import project_Yedam.dao.UserDAOImpl;
 
@@ -22,7 +23,8 @@ public class LetterPage {
 	
 	
 	private Scanner sc = new Scanner(System.in);
-	private ProjectDAO<Letter, String> letterDao = LetterDAOImpl.getInstance();
+	private ProjectDAO<Letter, String> rLetterDao = ReceivedLetterDAOImpl.getInstance();
+	private ProjectDAO<Letter, String> sLetterDao = SentLetterDAOImpl.getInstance();
 	private static User loggedInUser = null;
 	private String mailboxType = null;
 	private Main console = new Main();
@@ -121,7 +123,7 @@ public class LetterPage {
 
 		// setRecipientId()
 		System.out.println("┌─────────────────────────────── 쪽지보내기 ───────────────────────────────┐\n");
-		System.out.print("수신자 ID를 입력하세요.\n\n>>");
+		System.out.print("수신자 ID를 입력하세요.\n\n>> ");
 		String recipientId = sc.nextLine();
 		letter.setRecipientId(recipientId);
 		
@@ -130,7 +132,8 @@ public class LetterPage {
 			return;	// canceled sendLetter in newContent()
 		}
 		
-		letterDao.insert(letter);
+		rLetterDao.insert(letter);
+		sLetterDao.insert(letter);
 		System.out.println("쪽지를 보냈습니다.\n");
 		
 	}
@@ -148,7 +151,8 @@ public class LetterPage {
 				return;	// canceled sendLetter in newContent()
 			}
 			
-			letterDao.insert(reply);
+			rLetterDao.insert(reply);
+			sLetterDao.insert(reply);
 			System.out.println("쪽지를 보냈습니다.\n");
 			
 		}
@@ -240,7 +244,7 @@ public class LetterPage {
 		
 		while(true) {
 			
-			System.out.println("┌─────────────────────────────  " + mailboxType + "  ───────────────────────────────┐\n");
+			System.out.println("┌────────────────────────────── " + mailboxType + " ────────────────────────────────┐\n");
 			System.out.println("       1.전체쪽지         2.이름검색         3.내용검색       ㅤ 9.이전메뉴       ");
 			System.out.println("\n└───────────────────────────────────────────────────────────────────────┘");
 			System.out.print("\n>> ");
@@ -261,7 +265,7 @@ public class LetterPage {
 	
 	public void printLetters(int menu) {
 		
-		List<Letter> letterList = letterDao.selectAll();
+		List<Letter> letterList = rLetterDao.selectAll();
 		List<Letter> letters = null;
 		
 		if (mailboxType.equals("받은쪽지함")) {
@@ -300,22 +304,13 @@ public class LetterPage {
 		}
 	}
 	
-//	List<Letter> checkListNull(List<Letter> letters) {
-//		if (letters.size() == 0) {
-//			System.out.println("쪽지가 없습니다.");
-//			return null;
-//		} else {
-//			return letters;
-//		}
-//	}
-	
 	List<Letter> printAllReceivedLetters(List<Letter> letterList) {
 		
 		List<Letter> allLetters = new ArrayList<>();
 		
 		console.clear();
 		
-		System.out.println("\n\n\n┌──────────────────────────────  전체쪽지  ────────────────────────────────┐\n");
+		System.out.println("\n\n\n┌─────────────────────────────  전체쪽지  ────────────────────────────────┐\n");
 		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "보낸사람", "상태", "내", "용");
 		
 		int listNum = 1;
@@ -340,8 +335,11 @@ public class LetterPage {
 		
 		List<Letter> letters = new ArrayList<>();
 		
-		System.out.print("이름을 입력하세요.\n>> ");
+		System.out.print("\n보낸 사람의 이름을 입력하세요.\n>> ");
 		String name = sc.nextLine();
+		
+		console.clear();
+		
 		System.out.println("\n┌──────────────────────────────  이름검색  ────────────────────────────────┐\n");
 		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "보낸사람", "상태", "내", "용");
 
@@ -368,6 +366,10 @@ public class LetterPage {
 		System.out.print("내용을 입력하세요.\n> ");
 		String content = sc.nextLine();
 		
+		console.clear();
+		
+		System.out.println("┌───────────────────────────── 내용검색 ───────────────────────────────┐\n");
+		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "받는사람", "상태", "내", "용");
 		int listNum = 1;
 		for (Letter l : letterList) {
 			if (l.getContent().contains(content) && l.getRecipientId().equals(loggedInUser.getId())) {
@@ -388,12 +390,11 @@ public class LetterPage {
 		int menu = 0;
 		
 		while (true) {
-//			System.out.println("┌───────────────────────────────────────────────────────────────────────┐");
 			System.out.println("                   1.쪽지읽기                   9.이전메뉴                   ");
 			System.out.println("└───────────────────────────────────────────────────────────────────────┘");
 			
 			try {
-				System.out.print("\n\n>> ");
+				System.out.print("\n>> ");
 				menu = Integer.parseInt(sc.nextLine());
 
 			} catch (Exception e) {
@@ -404,13 +405,22 @@ public class LetterPage {
 			if (menu == 1) {
 				while (true) {
 					try {
-						System.out.print("쪽지 번호 선택\n> ");
+						System.out.print("\n쪽지 번호 선택\n>> ");
 						menu = Integer.parseInt(sc.nextLine());
 						Letter letter = null;
 						for (Letter l : letters) {
 							if (l.getLetterNum() == menu) {
-								letterDao.update(l);
-								letter = l;
+								switch(mailboxType) {
+								case "받은쪽지함":
+									rLetterDao.update(l);
+									letter = l;
+									break;
+								case "보낸쪽지함" :
+									sLetterDao.update(l);
+									letter = l;
+									break;
+								
+								}
 							}
 						}
 						
@@ -418,10 +428,11 @@ public class LetterPage {
 							System.err.println("잘못 입력하셨습니다.");
 						}
 						
-						System.out.println("\n\n\n─────────────────────────────────────────────────────────────────────────");
-						System.out.println(letter);
+						console.clear();
+						System.out.println("┌─────────────────────────────── 쪽지읽기 ─────────────────────────────────┐\n");
+						letter.printLetterInfo(mailboxType);
 						followUpMenu(letter);
-						break;
+						return;
 						
 					} catch (Exception e) {
 						System.err.println("\n잘못 입력하셨습니다.\n");
@@ -447,7 +458,7 @@ public class LetterPage {
 			
 			int menu = 0;
 			try {
-				System.out.print("메뉴 선택\n> ");
+				System.out.print("\n>> ");
 				menu = Integer.parseInt(sc.nextLine());
 				
 			} catch (Exception e) {
@@ -460,10 +471,15 @@ public class LetterPage {
 				return;
 
 			} else if(menu == 2) {
-				System.out.println("삭제 후에는 복구할 수 없습니다. 삭제하시겠습니까?");
+				if(mailboxType.equals("보낸쪽지함")) System.out.println("\n상대방이 읽지 않았을 경우 영구히 삭제됩니다.");
+				
+				System.out.println("\n삭제 후에는 복구할 수 없습니다. 삭제하시겠습니까?\n");
 				
 				while (true) {
-					System.out.print("1.삭제 9.이전메뉴\n> ");
+					System.out.println("                   1.삭제                      9.이전메뉴                   ");
+					System.out.println("└───────────────────────────────────────────────────────────────────────┘");
+					System.out.print("\n>> ");
+					
 					int select = 0;
 
 					try {
@@ -475,12 +491,30 @@ public class LetterPage {
 					}
 
 					if (select == 1) {
-						letterDao.delete(letter);
-						System.out.println("\n삭제되었습니다.");
+						if (mailboxType.equals("보낸쪽지함") && rLetterDao.selectOne(String.valueOf(letter.getTimestamp())).isRead() == 0) {
+							rLetterDao.delete(letter);
+							sLetterDao.delete(letter);
+							System.out.println("\n영구히 삭제되었습니다.\n");
+							
+						} else if (mailboxType.equals("받은쪽지함")) {
+							rLetterDao.delete(letter);
+							console.clear();							
+							System.out.println("\n받은 쪽지가 삭제되었습니다.\n");
+							
+						} else if (mailboxType.equals("보낸쪽지함")) {
+							sLetterDao.delete(letter);
+							console.clear();							
+							System.out.println("\n보낸 쪽지가 삭제되었습니다.\n");
+							
+						} else {
+							console.clear();							
+							System.out.println("쪽지 삭제 과정 중 오류가 있습니다.\n");
+						}
 						return;
 
 					} else if (select == 9) {
-						System.out.println("\n이전 메뉴로 돌아갑니다.");
+						console.clear();
+						System.out.println("이전 메뉴로 돌아갑니다.\n");
 						return;
 
 					} else {
@@ -503,8 +537,8 @@ public class LetterPage {
 		
 		List<Letter> allLetters = new ArrayList<>();
 		
-		System.out.println("\n\n\n─────────────────────────────────────────────────────────────────────────\n");
-		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "받는사람", "상태", "내", "용");
+		System.out.println("┌────────────────────────────── 전체쪽지 ────────────────────────────────┐\n");
+		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "보낸사람", "상태", "내", "용");
 		
 		int listNum = 1;
 		for (Letter letter : letterList) {
@@ -525,12 +559,16 @@ public class LetterPage {
 		
 		List<Letter> letters = new ArrayList<>();
 		
-		System.out.print("이름을 입력하세요.\n> ");
+		System.out.print("받는 사람의 이름을 입력하세요.\n>> ");
 		String name = sc.nextLine();
 		
+		console.clear();
+		
+		System.out.println("┌───────────────────────────── 이름검색 ───────────────────────────────┐\n");
+		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "받는사람", "상태", "내", "용");
 		int listNum = 1;
 		for (Letter l : letterList) {
-			if (l.getRecipientName().equals(name) && l.getSenderId().equals(loggedInUser.getId())) {
+			if (l.getRecipientName().equals(name) && l.getRecipientId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);
 				listNum++;
@@ -548,12 +586,17 @@ public class LetterPage {
 		
 		List<Letter> letters = new ArrayList<>();
 		
-		System.out.print("내용을 입력하세요.\n> ");
+		System.out.print("내용을 입력하세요.\n>> ");
 		String content = sc.nextLine();
+		
+		console.clear();
+		
+		System.out.println("┌───────────────────────────── 내용검색 ───────────────────────────────┐\n");
+		System.out.printf("%-3s %4s      %4s\t%-3s   %10s%-10s\n", "번호", "날짜", "받는사람", "상태", "내", "용");
 		
 		int listNum = 1;
 		for (Letter l : letterList) {
-			if (l.getContent().contains(content) && l.getRecipientId().equals(loggedInUser.getId())) {
+			if (l.getContent().contains(content) && l.getSenderId().equals(loggedInUser.getId())) {
 				l.setLetterNum(listNum);
 				letters.add(l);
 				listNum++;
@@ -587,8 +630,6 @@ public class LetterPage {
 			System.out.println("검색결과가 없습니다.");
 		}
 	}
-	
-	
 	
 	
 	

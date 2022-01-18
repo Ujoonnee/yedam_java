@@ -59,7 +59,7 @@ public class ArticleDAOImpl extends DAO implements ProjectDAO<Article, String> {
 		try {
 			connect();
 			String select = "SELECT * FROM articles WHERE article_num = ? AND board_type = ?";
-			System.out.print("글 번호를 입력하세요.\n> ");
+			System.out.print("\n글 번호를 입력하세요.\n>> ");
 			pstmt = con.prepareStatement(select);
 			pstmt.setInt(1, sc.nextInt());
 			pstmt.setString(2, boardType);
@@ -128,13 +128,15 @@ public class ArticleDAOImpl extends DAO implements ProjectDAO<Article, String> {
 	public void update(Article article) {
 		try {
 			connect();
-			String update = "UPDATE articles SET title = ?, content= ?, page_view = ? WHERE  article_num = ? AND board_type = ?";
+			String update = "UPDATE articles SET title = ?, content= ?, like_num = ?, unlike_num = ?, page_view = ? WHERE  article_num = ? AND board_type = ?";
 			pstmt = con.prepareStatement(update);
 			pstmt.setString(1, article.getTitle());
 			pstmt.setString(2, article.getContent());
-			pstmt.setInt(3, article.getPageView());
-			pstmt.setInt(4, article.getArticleNum());
-			pstmt.setString(5, article.getBoardType());
+			pstmt.setInt(3, article.getLikeNum());
+			pstmt.setInt(4, article.getUnlikeNum());
+			pstmt.setInt(5, article.getPageView());
+			pstmt.setInt(6, article.getArticleNum());
+			pstmt.setString(7, article.getBoardType());
 
 			pstmt.executeUpdate();
 

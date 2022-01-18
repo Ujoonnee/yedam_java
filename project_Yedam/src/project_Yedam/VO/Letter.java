@@ -77,7 +77,7 @@ public class Letter {
 		} else if (select == 1) {
 			return timeFormat[1].substring(0, 8); // HH:mm:ss
 		} else {
-			return timeFormat[0] + " " + timeFormat[1]; // yyyy-MM-dd HH:mm:ss
+			return timeFormat[0] + " " + timeFormat[1].substring(0, 8); // yyyy-MM-dd HH:mm:ss
 		}
 	}
 
@@ -110,10 +110,12 @@ public class Letter {
 		return recipientName;
 	}
 
-	@Override
-	public String toString() {
-		return "보낸 사람 : " + getSenderName() + "\t보낸 시각 : " + printTimestamp(2) + "\n\n" + content;
-				
+	public void printLetterInfo(String mailboxType) {
+		if (mailboxType.equals("받은쪽지함")) {
+			System.out.println("보낸 사람 : " + getSenderName() + "\t보낸 시각 : " + printTimestamp(2) + "\n\n" + content);
+		} else {
+			System.out.println("받는 사람 : " + getRecipientName() + "\t보낸 시각 : " + printTimestamp(2) + "\n\n" + content);
+		}
 	}
 
 	public void printList(String mailboxType) {
